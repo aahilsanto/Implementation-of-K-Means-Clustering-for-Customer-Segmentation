@@ -27,44 +27,40 @@ import pandas as pd
 import matplotlib.pyplot as plt
 from sklearn.cluster import KMeans
 
-data = pd.read_csv(r"E:\Desktop\CSE\Introduction To Machine Learning\dataset\Mall_Customers.csv")
+data=pd.read_csv(r"E:\Desktop\CSE\Introduction To Machine Learning\dataset\Mall_Customers.csv")
 print(data.head())
 print(data.info())
 print(data.isnull().sum())
 
-wcss = []
-for i in range(1, 11):
-    kmeans = KMeans(n_clusters=i, init="k-means++")
-    kmeans.fit(data.iloc[:, 3:])
+x=data.iloc[:,3:]
+
+wcss=[]
+
+for i in range(1,11):
+    kmeans=KMeans(n_clusters=i,init='k-means++')
+    kmeans.fit(x)
     wcss.append(kmeans.inertia_)
-    
-plt.plot(range(1, 11), wcss)
-plt.xlabel("No. of Clusters")
-plt.ylabel("WCSS")
+
+plt.plot(range(1,11),wcss,color="blue")
 plt.title("Elbow Method")
+plt.xlabel("No of Clusters")
+plt.ylabel("WSCC")
 plt.show()
 
-km = KMeans(n_clusters=5)
-km.fit(data.iloc[:, 3:])
+km=KMeans(n_clusters=5)
+km.fit(x)
+pred=km.predict(x)
+print("Prediction: ",pred)
+data['cluster']=pred
 
-y_pred = km.predict(data.iloc[:, 3:])
-print(y_pred)
-data["cluster"] = y_pred
+colors=['red','blue','green','yellow','orange']
 
-df0 = data[data["cluster"] == 0]
-df1 = data[data["cluster"] == 1]
-df2 = data[data["cluster"] == 2]
-df3 = data[data["cluster"] == 3]
-df4 = data[data["cluster"] == 4]
-
-plt.scatter(df0["Annual Income (k$)"], df0["Spending Score (1-100)"], c="red", label="cluster0")
-plt.scatter(df1["Annual Income (k$)"], df1["Spending Score (1-100)"], c="black", label="cluster1")
-plt.scatter(df2["Annual Income (k$)"], df2["Spending Score (1-100)"], c="blue", label="cluster2")
-plt.scatter(df3["Annual Income (k$)"], df3["Spending Score (1-100)"], c="green", label="cluster3")
-plt.scatter(df4["Annual Income (k$)"], df4["Spending Score (1-100)"], c="magenta", label="cluster4")
+for i in range(5):
+    cluster=data[data['cluster']==i]
+    plt.scatter(cluster['Annual Income (k$)'],cluster['Spending Score (1-100)'],c=colors[i],label=f"Cluster {i}")
 
 plt.legend()
-plt.title("Customer Segments")
+plt.title("Customer Segmentation")
 plt.xlabel("Annual Income (k$)")
 plt.ylabel("Spending Score (1-100)")
 plt.show()
